@@ -3,25 +3,44 @@ import ssl
 
 
 class URL:
+    """Класс для выполнения HTTP/HTTPS запросов."""
+
     def __init__(self, url):
+        """Инициализирует объект URL, разбирая переданный URL-адрес"""
+        # Разделяем URL на схему и остальную часть
         self.scheme, url = url.split("://", 1)
 
+        # Проверяем, что схема поддерживается (http или https)
         assert self.scheme in ["http", "https"]
+
+        # Устанавливаем порт по умолчанию в зависимости от схемы
         if self.scheme == "http":
             self.port = 80
         elif self.scheme == "https":
             self.port = 443
 
+        # Добавляем "/" к URL, если путь отсутствует
         if "/" not in url:
             url = url + "/"
+
+        # Разделяем URL на хост и путь
         self.host, url = url.split("/", 1)
         self.path = "/" + url
 
+        # Если в хосте указан порт, извлекаем его
         if ":" in self.host:
             self.host, port = self.host.split(":", 1)
             self.port = int(port)
 
     def request(self):
+        """
+        Выполняет HTTP/HTTPS запрос к серверу и возвращает содержимое ответа.
+            Возвращает:
+                str: Тело ответа от сервера.
+            Исключения:
+                AssertionError: Если ответ содержит Transfer-Encoding или Content-Encoding.
+        """
+
         # Создаем сокет для TCP-соединения
         s = socket.socket(
             family=socket.AF_INET,  # Используем IPv4
@@ -80,23 +99,3 @@ class URL:
 
         # Возвращаем содержимое ответа
         return content
-
-    @staticmethod
-    def show(body):
-        in_tag = False
-        for c in body:
-            if c == "<":
-                in_tag = True
-            elif c == ">":
-                in_tag = False
-            elif not in_tag:
-                print(c, end="")
-
-
-    def load(url):
-        body = url.request()
-        URL.show(body)
-
-if __name__ == "__main__":
-    import sys
-    URL.load(URL(sys.argv[1]))
