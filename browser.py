@@ -64,14 +64,15 @@ class URL:
         request += "Host: {}\r\n".format(self.host)  # Указываем хост
         request += "\r\n"  # Завершаем заголовки пустой строкой
 
-        # Отправляем запрос на сервер, кодируя его в UTF-8
+        # Отправляем запрос на сервер в кодировке UTF-8
         s.send(request.encode("utf8"))
 
         # Создаем файловый объект для чтения ответа от сервера
         response = s.makefile("r", encoding="utf8", newline="\r\n")
 
-        # Читаем первую строку ответа (статусную строку)
+        # Читаем первую строку ответа
         statusline = response.readline()
+
         # Разделяем статусную строку на версию HTTP, код статуса и пояснение
         version, status, explanation = statusline.split(" ", 2)
 
